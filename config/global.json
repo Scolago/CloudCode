@@ -1,0 +1,17 @@
+{
+  "global": {
+    "parseVersion": "1.4.2"
+  },
+  "applications": {
+    "MyCloudCode": {
+      "link": "Scolago"
+    },
+    "Scolago": {
+      "applicationId": "jjoBuu2HEquQ0EdAJTEqaF8pzZjgxDzJnjFXxJo6",
+      "masterKey": "GPGpMEFocmiV79KrOvJFP0UPDS485WaJ7EceFfE5"
+    },
+    "_default": {
+      "link": "Scolago"
+    }
+  }
+}
