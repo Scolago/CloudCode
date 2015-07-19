@@ -1,28 +1,17 @@
 var _ = require("underscore");
 var moment = require('moment');
 
-Parse.initialize('AppID', 'JS-Key');
+Parse.initialize('App-ID', 'JS-Key');
 
 Parse.Cloud.job("flush", function(request, status) {
-    flushFiles().then(function() {
-        status.success("Flushed Files successfully!");
-    });
-    flushArticles().then(function() {
-        status.success("Flushed Articles successfully!");
+    flushFiles() && flushArticles().then(function() {
+        status.success("Flushed Files and Articles successfully!");
     });
 });
 
-Parse.Cloud.job("ArticleFeed", function(request, status) {
-
-
-	// These are the Twitter users you want Tweets from, excluding the '@'
-	var screenNames = [
-		"uknj"
-	];
+Parse.Cloud.job("ArticleFileFeed", function(request, status) {
 
 	var promise = Parse.Promise.as();
-
-	_.each(screenNames, function(){
 
 		promise = promise.then(function(){
 
@@ -30,11 +19,15 @@ Parse.Cloud.job("ArticleFeed", function(request, status) {
 
 		});
 
-	});
+    promise = promise.then(function(){
+
+      return getFiles();
+
+    });
 
 	Parse.Promise.when(promise).then(function(){
 
-		status.success("Articles saved");
+		status.success("Articles and Files saved");
 
 	}, function(error){
 
@@ -49,11 +42,6 @@ function getArticles(){
 	var promise = new Parse.Promise();
 
 	var Articles = Parse.Object.extend("Articles");
-
-
-		// var ts = Math.floor(new Date().getTime() / 1000);
-		// var timestamp = ts.toString();
-
 
 		Parse.Cloud.httpRequest({
 			method: "GET",
@@ -232,38 +220,6 @@ function getFiles(){
 
 }
 
-Parse.Cloud.job("FilesList", function(request, status) {
-
-
-	// These are the Twitter users you want Tweets from, excluding the '@'
-	var screenNames = [
-		"nannerb",
-		"parseit"
-	];
-
-	var promise = Parse.Promise.as();
-
-	_.each(screenNames, function(){
-
-		promise = promise.then(function(){
-
-			return getFiles();
-
-		});
-
-	});
-
-	Parse.Promise.when(promise).then(function(){
-
-		status.success("Files saved");
-
-	}, function(error){
-
-		status.error(error.message);
-
-	});
-
-});
 
 Parse.Cloud.job("removeDuplicateFiles", function(request, status) {
 
