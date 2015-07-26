@@ -10,54 +10,37 @@ Parse.Cloud.job("flush", function(request, status) {
 });
 
 Parse.Cloud.job("ArticleFileFeed", function(request, status) {
-
 	var promise = Parse.Promise.as();
-
 		promise = promise.then(function(){
-
 			return getArticles();
-
 		});
 
     promise = promise.then(function(){
-
       return getFiles();
-
     });
 
 	Parse.Promise.when(promise).then(function(){
-
 		status.success("Articles and Files saved");
-
 	}, function(error){
-
 		status.error(error.message);
-
 	});
 
 });
 
 function getArticles(){
-
 	var promise = new Parse.Promise();
-
 	var Articles = Parse.Object.extend("Articles");
 
 		Parse.Cloud.httpRequest({
 			method: "GET",
 			url: 'http://www.scolago.com/001/articles/views/articles',
 			success: function(httpResponse) {
-
 				var data = JSON.parse(httpResponse.text);
-
 				var articles = new Array();
-
 				for (var i = 0; i < data.length; i++) {
-
 					var Articles = Parse.Object.extend("Articles"),
 						article = new Articles(),
 						content = data[i];
-
             article.set("body", content.body.und[0].value);
             article.set("vid", content.vid);
             article.set("title", content.title);
@@ -68,14 +51,11 @@ function getArticles(){
             article.set("dateCreated", epochTime);
 
             articles.push(article);
-
 				};
 
 				Parse.Object.saveAll(articles, {
 					success: function(objs) {
-
 						promise.resolve();
-
 					},
 					error: function(error) {
 						console.log(error);
@@ -90,8 +70,6 @@ function getArticles(){
 			}
 		});
 
-	// });
-
 	return promise;
 
 }
@@ -99,7 +77,7 @@ function getArticles(){
 
 function flushArticles() {
 
-  //Clear expired previous records from the class.
+  //Clear previous records from the class.
   var Articles = Parse.Object.extend("Articles");
   var article = new Articles();
   var arr = [];
@@ -136,7 +114,6 @@ Parse.Cloud.job("removeDuplicateArticles", function(request, status) {
   var _ = require("underscore");
   var Articles = Parse.Object.extend("Articles");
   var article = new Articles();
-
   var hashTable = {};
 
   function hashKeyForArticles(Articles) {
@@ -168,7 +145,6 @@ Parse.Cloud.job("removeDuplicateArticles", function(request, status) {
 function getFiles(){
 
 	var promise = new Parse.Promise();
-
 	var Files = Parse.Object.extend("Files");
 
 		Parse.Cloud.httpRequest({
@@ -177,7 +153,6 @@ function getFiles(){
 			success: function(httpResponse) {
 
 				var data = JSON.parse(httpResponse.text);
-
 				var files = new Array();
 
 				for (var i = 0; i < data.length; i++) {
@@ -188,18 +163,14 @@ function getFiles(){
             var filename = JSON.stringify(content.file_managed_filename)
             var filequotes = 'http://www.scolago.com/001/sites/default/files/'+ filename;
             var filelink = filequotes.replace(/"/g,"");
-
             file.set("file_link", filelink);
-
             files.push(file);
 
 				};
 
 				Parse.Object.saveAll(files, {
 					success: function(objs) {
-
 						promise.resolve();
-
 					},
 					error: function(error) {
 						console.log(error);
@@ -226,7 +197,6 @@ Parse.Cloud.job("removeDuplicateFiles", function(request, status) {
   var _ = require("underscore");
   var Files = Parse.Object.extend("Files");
   var file = new Files();
-
   var hashTable = {};
 
   function hashKeyForFiles(Files) {
@@ -241,7 +211,6 @@ Parse.Cloud.job("removeDuplicateFiles", function(request, status) {
   var filesQuery = new Parse.Query("Files");
   filesQuery.each(function (Files) {
     var key = hashKeyForFiles(Files);
-
     if (key in hashTable) { // this item was seen before, so destroy this
         return Files.destroy();
     } else { // it is not in the hashTable, so keep it
