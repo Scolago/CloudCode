@@ -46,15 +46,18 @@ function getArticles() {
 				var Articles = Parse.Object.extend("Articles"),
 					article = new Articles(),
 					content = data[i];
+					
 				article.set("body", content.body.und[0].value);
 				article.set("vid", content.vid);
 				article.set("title", content.title);
+
 				var epochTime = content.created;
 				var dateObject = parseInt(moment.unix(content.created).format());
 				var dateString = moment.unix(epochTime).format("MMMM D, YYYY, hh:mm");
 				article.set("dateString", dateString);
 				article.set("dateCreated", epochTime);
 
+				console.log(content.event_calendar_date.und[0].value);
 				articles.push(article);
 			};
 
@@ -169,6 +172,7 @@ function flushFiles() {
 	});
 }
 
+
 // Search the database for duplicate Articles and remove them
 Parse.Cloud.job("removeDuplicateArticles", function(request, status) {
 
@@ -240,14 +244,16 @@ Parse.Cloud.job("removeDuplicateFiles", function(request, status) {
 });
 
 
-function saving(type) {
-	Parse.Object.saveAll(type, {
-		success: function(objs) {
-			promise.resolve();
-		},
-		error: function(error) {
-			console.log(error);
-			promise.reject(error.message);
-		}
-	});
-}
+
+// Figure out if this function can be implemented where needed for DRY principle
+// function saving(type) {
+// 	Parse.Object.saveAll(type, {
+// 		success: function(objs) {
+// 			promise.resolve();
+// 		},
+// 		error: function(error) {
+// 			console.log(error);
+// 			promise.reject(error.message);
+// 		}
+// 	});
+// }
